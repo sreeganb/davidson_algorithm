@@ -1,3 +1,5 @@
 # davidson_algorithm
-Attempt at python code doing Davidson iterative Eigenvalue solver 
-Block Davidson code
+Iterative diagonalization methods:
+1) Power iteration
+2) Davidson method
+An attempt to implement these methods in python. 
