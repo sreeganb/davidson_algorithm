@@ -33,12 +33,13 @@ I = np.eye(n)
 # Begin iterations  
 #-------------------------------------------------------------------------------
 iter = 0
-for m in xrange(k,mmax,k):
-    iter = iter + 1
-    print "Iteration no:" % iter
+#for m in xrange(k,mmax,k):
+#    iter = iter + 1
+#    print "Iteration no:", iter
     # Matrix-vector products
-    T = multidot([t.T,A,t])
-    
+T = np.dot(t.T,np.dot(A,t))
+w, v = np.linalg.eig(T)
+print (w, v)    
 
 
 #for m in xrange(k,mmax,k):
