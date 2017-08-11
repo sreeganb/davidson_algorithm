@@ -8,11 +8,10 @@
 import numpy as np
 import math
 import time 
-from numpy.linalg import multi_dot
 
 # Build a fake sparse symmetric matrix 
 n = 100
-sparsity = 0.001
+sparsity = 0.0001
 A = np.zeros((n,n))
 for i in range(0,n) : 
     A[i,i] = i + 1
@@ -20,7 +19,7 @@ A = A + sparsity*np.random.randn(n,n)
 A = (A.T + A)/2
 
 tol = 1e-8              # Convergence tolerance
-mmax = n/2              # Maximum number of iterations
+mmax = 50              # Maximum number of iterations
 
 # Setup the subspace trial vectors
 k = 8
@@ -28,23 +27,21 @@ eig = 3
 t = np.eye(n,k) # trial vectors
 v = np.zeros((n,n))
 I = np.eye(n)
-#start_davidson = time.time()
 #-------------------------------------------------------------------------------
 # Begin iterations  
 #-------------------------------------------------------------------------------
+#start_davidson = time.time()
 iter = 0
-#for m in xrange(k,mmax,k):
-#    iter = iter + 1
-#    print "Iteration no:", iter
-    # Matrix-vector products
-T = np.dot(t.T,np.dot(A,t))
-w, v = np.linalg.eig(T)
-print (w, v)    
-
-
-#for m in xrange(k,mmax,k):
-#    if m <= k:
-#        for j in xrange(0,k):
-#            v[:,j] = t[:,j]/np.linalg.norm(t[:,j]) # normalize the vectors
-#print((t))
-#print ((v))
+for m in range(k,mmax,k):
+    iter = iter + 1
+    print ("Iteration no:", iter)
+    if iter==1:  # for first iteration add normalized guess vectors to matrix v
+        for l in range(k):
+            v[:,l] = t[:,l]/(np.linalg.norm(t[:,l]))
+    # Matrix-vector products, form the projected Hamiltonian in the subspace
+    T = np.linalg.multi_dot([v[:,:l+1].T,A,v[:,:l+1]]) # apparently selects fastest evaluation order
+    w, v = np.linalg.eig(T) # Diagonalize the subspace Hamiltonian
+    # Build residual vectors 
+    for j in range(k):
+        res = np.linalg.multi_dot([A,t,v[:,1]]) 
+    print (res)
