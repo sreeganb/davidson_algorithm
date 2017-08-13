@@ -27,6 +27,8 @@ eig = 3
 t = np.eye(n,k) # trial vectors
 v = np.zeros((n,n))
 I = np.eye(n)
+res = np.zeros((n,k))
+f = np.zeros((n,n))
 #-------------------------------------------------------------------------------
 # Begin iterations  
 #-------------------------------------------------------------------------------
@@ -39,9 +41,12 @@ for m in range(k,mmax,k):
         for l in range(k):
             v[:,l] = t[:,l]/(np.linalg.norm(t[:,l]))
     # Matrix-vector products, form the projected Hamiltonian in the subspace
-    T = np.linalg.multi_dot([v[:,:l+1].T,A,v[:,:l+1]]) # apparently selects fastest evaluation order
-    w, v = np.linalg.eig(T) # Diagonalize the subspace Hamiltonian
-    # Build residual vectors 
+    T = np.linalg.multi_dot([v[:,:m].T,A,v[:,:m]]) # apparently selects fastest evaluation order
+    w, vects = np.linalg.eig(T) # Diagonalize the subspace Hamiltonian
+    # Build residual vectors
+    for j in range(n):
+        f[j,j] = A[j,j] - w[1] 
     for j in range(k):
-        res = np.linalg.multi_dot([A,t,v[:,1]]) 
-    print (res)
+        res[:,j] = np.linalg.multi_dot([A,v[:,:m],vects[:,1]]) 
+#    print (res)
+    print (w)
