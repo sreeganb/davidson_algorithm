@@ -1,8 +1,9 @@
 #!/Users/StrangeQuark/anaconda3/bin/python
 
 #-------------------------------------------------------------------------------
-# Attempt at Davidson algorithm 
-# Sree Ganesh
+# Attempt at Block Davidson algorithm 
+# Sree Ganesh (sreeuci@gmail.com)
+# Summer 2017
 #-------------------------------------------------------------------------------
 
 import numpy as np
@@ -10,21 +11,23 @@ import math
 import time 
 
 # Build a fake sparse symmetric matrix 
-n = 2500
-print('dimension of the matrix',n,'*',n)
-sparsity = 0.0001
+n = 1600
+print('Dimension of the matrix',n,'*',n)
+sparsity = 0.001
 A = np.zeros((n,n))
 for i in range(0,n) : 
-    A[i,i] = i - 6
+    A[i,i] = i-9
 A = A + sparsity*np.random.randn(n,n)
 A = (A.T + A)/2
 
 tol = 1e-9             # Convergence tolerance
-mmax = 35              # Maximum number of iterations
+mmax = 20              # Maximum number of iterations
 
 # Setup the subspace trial vectors
-k = 5
+k = 4
+print ('No. of start vectors:',k)
 neig = 3
+print ('No. of desired Eigenvalues:',neig)
 t = np.eye(n,k) # initial trial vectors
 v = np.zeros((n,n)) # holder for trial vectors as iterations progress
 I = np.eye(n) # n*n identity matrix
@@ -55,7 +58,7 @@ for m in range(k,mmax,k):
         f = np.diag(1./ np.diag((np.diag(np.diag(A)) - w[ii]*I)))
 #        print (f)
         ritz[:,ii] = np.dot(f,np.linalg.multi_dot([(A-w[ii]*I),v[:,:m],vects[:,ii]]))
-        if np.linalg.norm(ritz[:,ii]) > 1e-6 :
+        if np.linalg.norm(ritz[:,ii]) > 1e-7 :
             ritz[:,ii] = ritz[:,ii]/(np.linalg.norm(ritz[:,ii]))
             v[:,m+jj] = ritz[:,ii]
             jj = jj + 1
@@ -74,9 +77,10 @@ for m in range(k,mmax,k):
         check_new = ss[:neig]
     check = np.linalg.norm(check_new - check_old)
     if check < tol:
+        print('Block Davidson converged at iteration no.:',iter)
         break
 end = time.time()
-print ('Davidson time:',end-start)
+print ('Block Davidson time:',end-start)
 start = time.time()
 eig, eigvecs = np.linalg.eig(A)
 end = time.time() 
@@ -85,4 +89,5 @@ ss = eig[s]
 print('Exact Diagonalization:')
 for ii in range(neig):    
     print(ss[ii])
-print ('Full Diagonalization time:',end-start)
+#print(ss[:neig])
+print ('Exact Diagonalization time:',end-start)

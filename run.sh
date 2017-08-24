@@ -1,3 +1,4 @@
 #!/bin/bash
 
-python power-itr.py
+python davidson.py
+#python power-itr.py
